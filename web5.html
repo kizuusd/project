@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Form & Sidebar Popout dengan Layout Menarik</title>
+  
+  <!-- Bootstrap CSS (untuk layout dasar & grid) -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+
+  <!-- Google Fonts (Bangers & Poppins) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link 
+    href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@300;400;700&display=swap" 
+    rel="stylesheet"
+  />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Boldonse&display=swap');
+    </style>
+
+  <style>
+    :root {
+      /* Warna-warna utama (bisa disesuaikan) */
+      --dark-blue: #211C84;
+      --medium-blue: #4D55CC;
+      --accent: #7A73D5; 
+      --light-purple: #B5A8D5;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--light-purple);
+      color: #333;
+      overflow-x: hidden; /* Mencegah scroll horizontal */
+    }
+
+    /* ========== SIDEBAR POPOUT ========== */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100vh;
+      background-color: var(--medium-blue);
+      color: #fff;
+      padding: 1rem;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    #sidebar.active {
+      transform: translateX(0);
+    }
+    .sidebar-logo a {
+      font-family: "boldonse", sans-serif;
+      font-size: 1.3rem;
+      color: #fff;
+      text-decoration: none;
+    }
+    .sidebar-logo img {
+        align-self: auto;
+      max-width: 100px;
+      height: auto;
+      margin-top: 0.5rem;
+    }
+
+    .sidebar-nav {
+      list-style: none;
+      margin-top: 1rem;
+      padding-left: 0;
+    }
+    .sidebar-header {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+    .sidebar-item {
+      margin: 0.5rem 0;
+    }
+    .sidebar-link {
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .sidebar-link:hover {
+      color: var(--light-purple);
+    }
+    .sidebar-footer {
+      position: absolute;
+      bottom: 1rem;
+      width: 100%;
+    }
+    .sidebar-footer a {
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* ========== TOMBOL TOGGLE SIDEBAR ========== */
+    .toggler-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      outline: none;
+      color: #fff;
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1100; /* Di atas foto background */
+    }
+    .toggler-btn:hover {
+      color: var(--accent);
+    }
+
+    /* ========== LAYOUT DUA KOLOM (LEFT: GAMBAR, RIGHT: FORM) ========== */
+    .layout-wrapper {
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh; /* Agar full tinggi layar */
+    }
+    /* Bagian kiri: Gambar anjing + area gelap */
+    .left-panel {
+      flex: 1;
+      background: url("https://i.pinimg.com/474x/bc/15/e4/bc15e4c30d8032abaeca7eb69469a8ea.jpg") center/cover no-repeat;
+      position: relative;
+      /* Agar teks di atas background lebih jelas, bisa pakai overlay */
+    }
+    .left-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+    }
+    /* Bagian kanan: Form pendaftaran */
+    .right-panel {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background-color: #fff;
+    }
+
+    /* ========== FORM STYLE ========== */
+    main {
+      width: 100%;
+      max-width: 400px;
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    h2 {
+      font-family: "boldonse", sans-serif;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      font-size: 2rem;
+      text-align: center;
+    }
+    .form-group label {
+      font-weight: 600;
+      color: var(--dark-blue);
+    }
+    .error {
+      color: red;
+      font-size: 0.9em;
+    }
+    .success-message {
+      color: green;
+      font-weight: bold;
+      margin-top: 10px;
+      text-align: center;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Responsif untuk mobile */
+    @media (max-width: 768px) {
+      .layout-wrapper {
+        flex-direction: column;
+      }
+      .left-panel {
+        height: 200px; /* Tinggi gambar di mobile */
+        background-position: top;
+      }
+      .left-overlay {
+        height: 200px;
+      }
+      .right-panel {
+        width: 100%;
+        flex: unset;
+        padding: 1rem;
+      }
+      .toggler-btn {
+        top: 0.5rem;
+        left: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <a href="">Politeknik NegeriMadiun</a>
+      <img src="Politeknik Negeri Madiun.png" alt="logo" >
+    </div>
+    <ul class="sidebar-nav p-0">
+      <li class="sidebar-header">FITUR</li>
+      <li class="sidebar-item">
+        <a href="" class="sidebar-link">
+          <i class="bi bi-house"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="" class="sidebar-link">
+          <i class="bi bi-question"></i>
+          <span>About</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="" class="sidebar-link">
+          <i class="bi bi-person"></i>
+          <span>Profile</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="" class="sidebar-link">
+          <i class="bi bi-info-square-fill"></i>
+          <span>Information</span>
+        </a>
+      </li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="" class="sidebar-footer">
+        <i class="bi bi-box-arrow-left"></i>
+        <span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Tombol Toggle Sidebar -->
+  <button class="toggler-btn" type="button" id="sidebarToggle">☰</button>
+
+  <!-- Layout Wrapper -->
+  <div class="layout-wrapper">
+    <!-- Left Panel (Gambar Anjing) -->
+    <div class="left-panel">
+      <div class="left-overlay"></div>
+    </div>
+
+    <!-- Right Panel (Form Registrasi) -->
+    <div class="right-panel">
+      <main>
+        <h2>Form Registrasi</h2>
+        <p class="text-center mb-4">Silakan mengisi form di bawah ini untuk mendaftar.</p>
+        <form id="registrationForm" novalidate>
+          <div class="form-group">
+            <label for="fullname">Nama Lengkap</label>
+            <input type="text" class="form-control" id="fullname" placeholder="Masukkan nama lengkap" aria-describedby="fullnameError">
+            <div class="error" id="fullnameError"></div>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" placeholder="Masukkan email" aria-describedby="emailError">
+            <div class="error" id="emailError"></div>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" placeholder="Minimal 8 karakter" aria-describedby="passwordError">
+            <div class="error" id="passwordError"></div>
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Konfirmasi Password</label>
+            <input type="password" class="form-control" id="confirmPassword" placeholder="Konfirmasi password" aria-describedby="confirmPasswordError">
+            <div class="error" id="confirmPasswordError"></div>
+          </div>
+          <div class="form-group">
+            <label for="dob">Tanggal Lahir</label>
+            <input type="date" class="form-control" id="dob" aria-describedby="dobError">
+            <div class="error" id="dobError"></div>
+          </div>
+          <div class="form-group">
+            <label for="phone">Nomor HP</label>
+            <input type="text" class="form-control" id="phone" placeholder="08123456789" aria-describedby="phoneError">
+            <div class="error" id="phoneError"></div>
+          </div>
+          <button type="submit" id="submitBtn" class="btn btn-primary w-100 mt-3" disabled>Submit</button>
+          <div class="success-message" id="successMessage"></div>
+        </form>
+      </main>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // SIDEBAR TOGGLE
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      const sidebar = document.getElementById('sidebar');
+      sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+      });
+
+      // FORM VALIDATION
+      const form = document.getElementById('registrationForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const successMessage = document.getElementById('successMessage');
+
+      const fullname = document.getElementById('fullname');
+      const email = document.getElementById('email');
+      const password = document.getElementById('password');
+      const confirmPassword = document.getElementById('confirmPassword');
+      const dob = document.getElementById('dob');
+      const phone = document.getElementById('phone');
+
+      const fullnameError = document.getElementById('fullnameError');
+      const emailError = document.getElementById('emailError');
+      const passwordError = document.getElementById('passwordError');
+      const confirmPasswordError = document.getElementById('confirmPasswordError');
+      const dobError = document.getElementById('dobError');
+      const phoneError = document.getElementById('phoneError');
+
+      function validateFullname() {
+        if (fullname.value.trim().length < 3) {
+          fullnameError.textContent = 'Nama lengkap harus minimal 3 karakter.';
+          return false;
+        } else {
+          fullnameError.textContent = '';
+          return true;
+        }
+      }
+
+      function validateEmail() {
+        const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+        if (!regex.test(email.value.trim())) {
+          emailError.textContent = 'Format email tidak valid.';
+          return false;
+        } else {
+          emailError.textContent = '';
+          return true;
+        }
+      }
+
+      function validatePassword() {
+        if (password.value.length < 8) {
+          passwordError.textContent = 'Password harus minimal 8 karakter.';
+          return false;
+        } else {
+          passwordError.textContent = '';
+          return true;
+        }
+      }
+
+      function validateConfirmPassword() {
+        if (confirmPassword.value !== password.value) {
+          confirmPasswordError.textContent = 'Konfirmasi password tidak sama.';
+          return false;
+        } else {
+          confirmPasswordError.textContent = '';
+          return true;
+        }
+      }
+
+      function validateDob() {
+        if (!dob.value) {
+          dobError.textContent = 'Tanggal lahir harus diisi.';
+          return false;
+        }
+        const selectedDate = new Date(dob.value);
+        const cutoffDate = new Date('2006-12-31');
+        if (selectedDate > cutoffDate) {
+          dobError.textContent = 'Tanggal lahir tidak boleh lebih dari tahun 2006.';
+          return false;
+        } else {
+          dobError.textContent = '';
+          return true;
+        }
+      }
+
+      function validatePhone() {
+        if (phone.value.trim().length < 10) {
+          phoneError.textContent = 'Nomor HP harus minimal 10 karakter.';
+          return false;
+        } else {
+          phoneError.textContent = '';
+          return true;
+        }
+      }
+
+      function validateForm() {
+        const isFullnameValid = validateFullname();
+        const isEmailValid = validateEmail();
+        const isPasswordValid = validatePassword();
+        const isConfirmValid = validateConfirmPassword();
+        const isDobValid = validateDob();
+        const isPhoneValid = validatePhone();
+
+        const formValid = isFullnameValid && isEmailValid && isPasswordValid && isConfirmValid && isDobValid && isPhoneValid;
+        submitBtn.disabled = !formValid;
+        return formValid;
+      }
+
+      // Event listeners untuk setiap input
+      fullname.addEventListener('input', validateForm);
+      email.addEventListener('input', validateForm);
+      password.addEventListener('input', validateForm);
+      confirmPassword.addEventListener('input', validateForm);
+      dob.addEventListener('input', validateForm);
+      phone.addEventListener('input', validateForm);
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (validateForm()) {
+          successMessage.textContent = 'Form berhasil disubmit!';
+          form.reset();
+          submitBtn.disabled = true;
+          setTimeout(() => {
+            successMessage.textContent = '';
+          }, 5000);
+        }
+      });
+    });
+  </script>
+
+  <!-- Bootstrap JS (jika diperlukan) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
